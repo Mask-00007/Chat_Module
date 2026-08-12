@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Message</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --brand: #159685;
+        --brand-deep: #0b5d52;
+        --accent: #22c55e;
+        --accent-dark: #189a53;
+
+        --page-bg: #dfe3e5;
+        --panel-bg: #ffffff;
+        --wallpaper-bg: #efe9e1;
+
+        --bubble-sent: #d7f5c4;
+
+        --divider: #e9edef;
+        --text-primary: #111b21;
+        --text-secondary: #667781;
+        --text-muted: #8696a0;
+        --danger: #e14b4b;
+
+        --font-ui: "Inter", system-ui, sans-serif;
+        --font-mono: "JetBrains Mono", monospace;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: var(--font-ui);
+        color: var(--text-primary);
+        background: var(--page-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .chat-app {
+        width: min(100%, 480px);
+        display: flex;
+        flex-direction: column;
+        background: var(--panel-bg);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ============ HEADER ============ */
+      .chat-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--brand);
+        color: #fff;
+        padding: 14px 18px;
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 13px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .chat-header h1 {
+        font-size: 15.5px;
+        font-weight: 600;
+      }
+
+      .chat-header p {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 1px;
+      }
+
+      .chat-header p span {
+        font-family: var(--font-mono);
+      }
+
+      /* ============ PREVIEW ============ */
+      .thread-wrapper {
+        background: var(--wallpaper-bg);
+        padding: 16px;
+      }
+
+      .preview-label {
+        text-align: center;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+      }
+
+      .bubble-row {
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      .bubble {
+        max-width: 82%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border-top-right-radius: 2px;
+        background: var(--bubble-sent);
+        font-size: 14px;
+        line-height: 1.45;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+
+      .bubble:empty::before {
+        content: "Nothing to preview yet";
+        color: var(--text-muted);
+        font-style: italic;
+      }
+
+      /* ============ FORM ============ */
+      .edit-form {
+        padding: 16px 18px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+      }
+
+      textarea {
+        width: 100%;
+        resize: vertical;
+        min-height: 110px;
+        border: 1px solid var(--divider);
+        outline: none;
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.5;
+        color: var(--text-primary);
+        transition:
+          border-color 0.15s ease,
+          box-shadow 0.15s ease;
+      }
+      textarea:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(21, 150, 133, 0.12);
+      }
+      textarea.invalid {
+        border-color: var(--danger);
+      }
+
+      .char-count {
+        align-self: flex-end;
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        color: var(--text-muted);
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .cancel-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 18px;
+        min-height: 42px;
+        border: 1px solid var(--divider);
+        border-radius: 20px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        transition: background 0.15s ease;
+      }
+      .cancel-btn:hover {
+        background: #f0f2f5;
+      }
+
+      .save-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        padding: 0 20px;
+        min-height: 42px;
+        border: none;
+        border-radius: 20px;
+        background: var(--accent);
+        color: #fff;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background 0.15s ease,
+          transform 0.15s ease;
+      }
+      .save-btn:hover {
+        background: var(--accent-dark);
+        transform: translateY(-1px);
+      }
+      .save-btn:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-app">
+      <header class="chat-header">
+        <div class="avatar"><%= chat.to.charAt(0).toUpperCase() %></div>
+        <div>
+          <h1>Edit message</h1>
+          <p>
+            <%= chat.from %> → <%= chat.to %> · <span><%= chat._id %></span>
+          </p>
+        </div>
+      </header>
+
+      <div class="thread-wrapper">
+        <p class="preview-label">Preview</p>
+        <div class="bubble-row">
+          <div class="bubble" id="preview"><%= chat.msg %></div>
+        </div>
+      </div>
+
+      <form
+        class="edit-form"
+        method="POST"
+        action="/chats/<%= chat._id %>?_method=PUT"
+        id="editForm"
+      >
+        <label for="msg">Message</label>
+        <textarea id="msg" name="msg" required><%= chat.msg %></textarea>
+        <span class="char-count" id="charCount">0</span>
+
+        <div class="form-actions">
+          <a href="/chats" class="cancel-btn">Cancel</a>
+          <button type="submit" class="save-btn">Update chat</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      const msgInput = document.getElementById("msg");
+      const preview = document.getElementById("preview");
+      const charCount = document.getElementById("charCount");
+      const form = document.getElementById("editForm");
+
+      function updatePreview() {
+        const text = msgInput.value;
+        preview.textContent = text;
+        charCount.textContent = text.length;
+      }
+
+      msgInput.addEventListener("input", updatePreview);
+      updatePreview();
+
+      form.addEventListener("submit", (e) => {
+        if (msgInput.value.trim() === "") {
+          e.preventDefault();
+          msgInput.classList.add("invalid");
+        }
+      });
+    </script>
+  </body>
+</html>
