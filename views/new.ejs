@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Module</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --brand: #159685;
+        --brand-deep: #0b5d52;
+        --accent: #22c55e;
+        --accent-dark: #189a53;
+
+        --page-bg: #dfe3e5;
+        --panel-bg: #ffffff;
+        --wallpaper-bg: #efe9e1;
+
+        --bubble-sent: #d7f5c4;
+        --bubble-received: #ffffff;
+
+        --divider: #e9edef;
+        --text-primary: #111b21;
+        --text-secondary: #667781;
+        --text-muted: #8696a0;
+
+        --font-ui: "Inter", system-ui, sans-serif;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        font-family: var(--font-ui);
+        color: var(--text-primary);
+        background: var(--page-bg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      /* ============ CHAT CARD ============ */
+      .chat-app {
+        width: min(100%, 480px);
+        height: min(85vh, 680px);
+        display: flex;
+        flex-direction: column;
+        background: var(--panel-bg);
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ============ HEADER ============ */
+      .chat-header {
+        flex-shrink: 0;
+        background: var(--brand);
+        color: #fff;
+        padding: 14px 18px;
+      }
+
+      .chat-header-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .avatar {
+        width: 38px;
+        height: 38px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 13px;
+        color: #fff;
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .receiver-input {
+        border: none;
+        outline: none;
+        background: transparent;
+        color: #fff;
+        font-family: inherit;
+        font-size: 15.5px;
+        font-weight: 600;
+        width: 100%;
+      }
+      .receiver-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .chat-status {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.8);
+        margin-top: 1px;
+      }
+
+      .from-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 10px;
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .from-input {
+        flex: 1;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+        outline: none;
+        background: transparent;
+        color: #fff;
+        font-family: inherit;
+        font-size: 12.5px;
+        padding: 2px 0;
+      }
+      .from-input::placeholder {
+        color: rgba(255, 255, 255, 0.65);
+      }
+      .from-input.invalid,
+      .receiver-input.invalid {
+        border-bottom: 1px solid #ffd1d1;
+      }
+
+      /* ============ THREAD ============ */
+      .thread-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        background: var(--wallpaper-bg);
+        padding: 16px;
+      }
+
+      .thread {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .date-chip {
+        align-self: center;
+        background: #e4f0ee;
+        color: #3a6b62;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+      }
+
+      .bubble-row {
+        display: flex;
+      }
+      .bubble-row.sent {
+        justify-content: flex-end;
+      }
+      .bubble-row.received {
+        justify-content: flex-start;
+      }
+
+      .bubble {
+        max-width: 78%;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 1.45;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.08);
+        opacity: 0;
+        transform: translateY(6px);
+        animation: pop 0.22s ease forwards;
+      }
+
+      @keyframes pop {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .bubble.received {
+        background: var(--bubble-received);
+        border-top-left-radius: 2px;
+      }
+
+      .bubble.sent {
+        background: var(--bubble-sent);
+        border-top-right-radius: 2px;
+      }
+
+      .bubble-text {
+        word-break: break-word;
+        white-space: pre-wrap;
+      }
+
+      .bubble-time {
+        display: block;
+        text-align: right;
+        font-size: 10.5px;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+
+      /* ============ COMPOSER ============ */
+      .composer {
+        flex-shrink: 0;
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+        padding: 12px 14px;
+        background: #f7f7f5;
+        border-top: 1px solid var(--divider);
+      }
+
+      .composer-input {
+        flex: 1;
+        resize: none;
+        border: 1px solid var(--divider);
+        outline: none;
+        background: #fff;
+        border-radius: 20px;
+        padding: 10px 16px;
+        font-family: inherit;
+        font-size: 14px;
+        line-height: 1.4;
+        max-height: 100px;
+        color: var(--text-primary);
+      }
+      .composer-input:focus {
+        border-color: var(--brand);
+      }
+      .composer-input.invalid {
+        border-color: #e14b4b;
+      }
+
+      .send-btn {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        border: none;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        font-size: 17px;
+        cursor: pointer;
+        transition:
+          background 0.15s ease,
+          transform 0.15s ease;
+      }
+      .send-btn:hover {
+        background: var(--accent-dark);
+        transform: translateY(-1px);
+      }
+      .send-btn:active {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-app">
+      <!-- Header: receiver name + your name -->
+      <header class="chat-header">
+        <div class="chat-header-top">
+          <div class="avatar" id="receiverAvatar">?</div>
+          <div style="flex: 1; min-width: 0">
+            <input
+              type="text"
+              id="to"
+              class="receiver-input"
+              placeholder="Receiver's name"
+              maxlength="60"
+              required
+            />
+            <div class="chat-status">Online</div>
+          </div>
+        </div>
+
+        <div class="from-row">
+          <span>Chatting as</span>
+          <input
+            type="text"
+            id="from"
+            class="from-input"
+            placeholder="Your name"
+            maxlength="60"
+            required
+          />
+        </div>
+      </header>
+
+      <!-- Message thread -->
+      <div class="thread-wrapper">
+        <div class="thread" id="thread">
+          <div class="date-chip">Today</div>
+          <div class="bubble-row received">
+            <div class="bubble received">
+              <span class="bubble-text">Hey! What's up? 👋</span>
+              <span class="bubble-time">9:41 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Composer: adds the message instantly on submit -->
+      <form class="composer" id="chatForm" action="/chats" method="POST">
+        <textarea
+          id="msg"
+          name="msg"
+          class="composer-input"
+          placeholder="Type a message"
+          rows="1"
+          maxlength="500"
+          required
+        ></textarea>
+        <button type="submit" class="send-btn" aria-label="Send message">
+          ➤
+        </button>
+      </form>
+    </div>
+
+    <script>
+      const fromInput = document.getElementById("from");
+      const toInput = document.getElementById("to");
+      const msgInput = document.getElementById("msg");
+      const receiverAvatar = document.getElementById("receiverAvatar");
+      const thread = document.getElementById("thread");
+      const threadWrapper = document.querySelector(".thread-wrapper");
+      const form = document.getElementById("chatForm");
+
+      // Show the receiver's initial in the avatar as they type
+      toInput.addEventListener("input", () => {
+        const name = toInput.value.trim();
+        receiverAvatar.textContent = name ? name.charAt(0).toUpperCase() : "?";
+      });
+
+      // Let the textarea grow as the message gets longer
+      msgInput.addEventListener("input", () => {
+        msgInput.style.height = "auto";
+        msgInput.style.height = Math.min(msgInput.scrollHeight, 100) + "px";
+      });
+
+      // Press Enter to send, Shift+Enter for a new line
+      msgInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          form.requestSubmit();
+        }
+      });
+
+      function formatTime() {
+        const d = new Date();
+        let h = d.getHours();
+        const m = d.getMinutes().toString().padStart(2, "0");
+        const suffix = h >= 12 ? "PM" : "AM";
+        h = h % 12 || 12;
+        return `${h}:${m} ${suffix}`;
+      }
+
+      function addMessageToThread(text) {
+        const row = document.createElement("div");
+        row.className = "bubble-row sent";
+        row.innerHTML = `
+        <div class="bubble sent">
+          <span class="bubble-text"></span>
+          <span class="bubble-time"></span>
+        </div>
+      `;
+        row.querySelector(".bubble-text").textContent = text;
+        row.querySelector(".bubble-time").textContent = formatTime();
+        thread.appendChild(row);
+        threadWrapper.scrollTop = threadWrapper.scrollHeight;
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        // Basic validation
+        let valid = true;
+        [fromInput, toInput, msgInput].forEach((el) => {
+          const empty = el.value.trim() === "";
+          el.classList.toggle("invalid", empty);
+          if (empty) valid = false;
+        });
+        if (!valid) return;
+
+        const text = msgInput.value.trim();
+
+        // 1. Show the message immediately — no waiting on the server
+        addMessageToThread(text);
+
+        // 2. Send it to the backend in the background (adjust the URL as needed)
+        fetch(form.action, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({
+            from: fromInput.value.trim(),
+            to: toInput.value.trim(),
+            msg: text,
+          }),
+        }).catch(() => {
+          /* Ignore network errors here — the message already shows on screen.
+           Add your own error handling (e.g. a "failed to send" label) if needed. */
+        });
+
+        // 3. Reset the input for the next message
+        msgInput.value = "";
+        msgInput.style.height = "auto";
+      });
+    </script>
+  </body>
+</html>
